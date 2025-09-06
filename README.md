@@ -52,7 +52,7 @@ Our central circuit, **"Janus"**, creates a verifiable "Proof of Audit." It prov
     CIRCUIT_NAME=Janus
     POWER_OF_TAU=16
     ```
-    *(Note: Our main circuit file is located at `circuits/Janus.circom`)*
+    *(Note: Our main circuit file is located at `circuits/Janus.circom`)* similarly proof_of_prompt.circom
 
 2.  **Set Your Private Input:**
     Open `scripts-circom/main.js` and replace the placeholder `promptString` with the secret you want to prove knowledge of.
