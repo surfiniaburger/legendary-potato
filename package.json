@@ -1,0 +1,23 @@
+{
+  "name": "circom-scaffold",
+  "version": "1.0.0",
+  "description": "A starter template for Foundry-based circom projects with basic scripts and dependencies.",
+  "main": "",
+  "scripts": {
+    "all": "make",
+    "plonk-fflonk": "make plonk-fflonk",
+    "skip": "make skip"
+  },
+  "keywords": [],
+  "author": "plok",
+  "license": "MIT",
+  "packageManager": "pnpm@10.9.0",
+  "dependencies": {
+    "app-root-path": "^3.1.0",
+    "circomkit": "^0.3.3",
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7",
+    "dotenv": "^16.5.0",
+    "snarkjs": "^0.7.5"
+  }
+}
