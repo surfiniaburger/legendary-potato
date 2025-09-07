@@ -4,6 +4,8 @@ This repository contains the core Zero-Knowledge Proof engine for the **ZK-RedTe
 
 Our central circuit, **"Janus"**, creates a verifiable "Proof of Audit." It proves that a specific, secret adversarial prompt was used to red team an AI model, without revealing the prompt itself. This allows for private, verifiable AI safety audits.
 
+We are using `gpt-oss` to jailbreak itself and then using cryptography to *prove* that this kind of jailbreak is possible. We are using the model as both the poacher and the gamekeeper. 
+
 ![ZK RedTeam](flow.jpeg)
 
 ## Features
@@ -64,7 +66,7 @@ This template has been modified to work with the latest version of the Circom co
 **To generate a proof for the "Janus" circuit:**
 
 ```bash
-make skip
+make hackathon CIRCUIT_NAME=Janus
 ```
 
 This single command will:

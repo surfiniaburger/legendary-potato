@@ -16,6 +16,23 @@ plonk-fflonk: new-tau contribute-tau-first contribute-tau-second create-challeng
 # Skip when u already have powersoftau files and you want to skip the phase 2 ceremony
 skip: compile info setup-export-key generate-proof-verify generate-verifier solidity-calldata test
 
+# ===============================================================
+# OUR CUSTOM HACKATHON WORKFLOW
+# This rule does everything we need to build and test our project.
+# ===============================================================
+
+hackathon:
+	@echo "--- (1/5) Compiling Circuit ---"
+	@make compile CIRCUIT_NAME=$(CIRCUIT_NAME)
+	@echo "\n--- (2/5) Generating ZKP Keys ---"
+	@make setup-export-key CIRCUIT_NAME=$(CIRCUIT_NAME)
+	@echo "\n--- (3/5) Generating Solidity Verifier ---"
+	@make generate-verifier CIRCUIT_NAME=$(CIRCUIT_NAME)
+	@echo "\n--- (4/5) Generating Proof ---"
+	@make generate-proof-verify CIRCUIT_NAME=$(CIRCUIT_NAME)
+	@echo "\n--- (5/5) Generating Solidity Calldata for Test ---"
+	@make solidity-calldata CIRCUIT_NAME=$(CIRCUIT_NAME)
+
 # # Inspect the circuit
 # inspect:
 # 	@circomspect ./circuits/$(CIRCUIT_NAME).circom
@@ -123,15 +140,15 @@ generate-proof-verify:
 
 # Generate the verifier contract
 generate-verifier:
-	snarkjs zkey export solidityverifier ./outputs/keys/$(CIRCUIT_NAME)_final.zkey ./src/$(CIRCUIT_NAME)_Verifier.sol
+	npx snarkjs zkey export solidityverifier ./outputs/keys/$(CIRCUIT_NAME)_final.zkey ./src/$(CIRCUIT_NAME)_Verifier.sol
 
 # Generate the solidity calldata for the proof
 solidity-calldata:
-	snarkjs zkey export soliditycalldata ./outputs/verify/$(CIRCUIT_NAME)_public.json ./outputs/verify/$(CIRCUIT_NAME)_proof.json
+	npx snarkjs zkey export soliditycalldata ./outputs/verify/$(CIRCUIT_NAME)_public.json ./outputs/verify/$(CIRCUIT_NAME)_proof.json
 
 # Verify the proof wih the verification key
 test:
-	snarkjs groth16 verify ./outputs/keys/$(CIRCUIT_NAME)_verification_key.json ./outputs/verify/$(CIRCUIT_NAME)_public.json ./outputs/verify/$(CIRCUIT_NAME)_proof.json
+	npx snarkjs groth16 verify ./outputs/keys/$(CIRCUIT_NAME)_verification_key.json ./outputs/verify/$(CIRCUIT_NAME)_public.json ./outputs/verify/$(CIRCUIT_NAME)_proof.json
 
 # Clean the outputs directory and remove the generated files
 clean:
