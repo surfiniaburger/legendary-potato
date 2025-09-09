@@ -22,6 +22,6 @@ contract JanusTest is Test {
         );
 
         // We will assert that the verification returns true.
-        // assertTrue(success);
+         assertTrue(success);
     }
 }
