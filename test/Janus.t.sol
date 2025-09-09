@@ -21,7 +21,8 @@ contract JanusTest is Test {
             ["0x2fc64ef0827b779a24799802aadd3e426c769a54f36da65b508d481042a8b86a", "0x0fce8f5956b0cb8ce5526de88d3ef65097c4d09674a314d8e45bd10e86ac20b4"],[["0x2f5fe856939460b45f2d5d546c1a0e46abf939cb195f6911fe3f59f383c22cfc", "0x30018a0642c5644f6e7f6f5aa5a1fc3799ad3c33953add0a028413ac9783bb63"],["0x011876d5c6a0c91646be4ec3a380d4367836b4877a464d76a73f33e709e5a474", "0x186067c41e688f4e64e07b857836cc71fec92808e9b1f30ec75f781e3f187ee6"]],["0x1a6fbb1b8ada65c99c7a583dc5b22c04042467f8f097c8a457899488b6545ffa", "0x1f8810a585d1858c0f946188b9ebce1a84ae8f044693b8a90116ba4ae8a808e4"],["0x026cb3613b8e05f1f8cdf36c9ca42cdd183bc63490194ddf879410635517860f"]
         );
 
+        System.out.println("Success status: " + success);
         // We will assert that the verification returns true.
-         assertTrue(success);
+        assertTrue(success);
     }
 }
