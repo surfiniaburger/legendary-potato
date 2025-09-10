@@ -1,30 +1,49 @@
-# ZK-RedTeam: The "Janus" Proof of Audit Circuit
+# ZK-RedTeam: A Verifiable & Private AI Safety Auditing System
 
-This repository contains the core Zero-Knowledge Proof engine for the **ZK-RedTeam** project, submitted to the OpenAI Open Model Hackathon. It is based on the `circom-startup` template.
+**🏆 A Submission to the OpenAI Open Model Hackathon | Categories: Wildcard & For Humanity 🏆**
 
-Our central circuit, **"Janus"**, creates a verifiable "Proof of Audit." It proves that a specific, secret adversarial prompt was used to red team an AI model, without revealing the prompt itself. This allows for private, verifiable AI safety audits.
+ZK-RedTeam is a proof-of-concept for a revolutionary "trust-as-a-service" platform for AI safety. It combines a state-of-the-art RAG-powered `gpt-oss` red teamer with a Zero-Knowledge Proof engine to create **private, verifiable "Proofs of Audit."**
 
-We are using `gpt-oss` to jailbreak itself and then using cryptography to *prove* that this kind of jailbreak is possible. We are using the model as both the poacher and the gamekeeper. 
+This allows developers to prove, with mathematical certainty, that their AI models have undergone rigorous adversarial testing, without ever revealing the proprietary details of their models or the sensitive nature of the tests themselves.
 
-![ZK RedTeam](flow.jpeg)
+![ZK-RedTeam Flowchart](flow.jpeg)
 
-## Features
+---
 
-- **Janus Circuit**: A Circom circuit that proves knowledge of a 256-character string's preimage to a Poseidon hash.
-- **Automated Workflow**: Uses the template's `Makefile` for streamlined compilation, key generation, and proof generation.
-- **Groth16 Proving System**: Optimized for small proof sizes and fast verification.
-- **Solidity Verifier Export**: Capable of generating a smart contract for on-chain verification of audits.
+## The Problem: The Trust Deficit in AI Safety
 
-## Getting Started
+As AI models become more powerful, how can we trust that they are safe? Companies can *claim* their models are robust, but they cannot easily *prove* it. The auditing process is a black box. This project solves that problem.
+
+Our journey led us to a key discovery: the base `gpt-oss` model is so well-aligned that it resists generating adversarial content. We had to develop a sophisticated, multi-step RAG pipeline to jailbreak the jailbreaker, demonstrating a critical vulnerability class. ZK-RedTeam is not just a tool; it's a demonstration of *why* verifiable auditing is so essential.
+
+## How It Works: The "Cloud AI + Local Prover" Architecture
+
+Our system is a hybrid architecture that leverages the best of both cloud and local computing:
+
+1.  **AI Red Teamer (Cloud/Kaggle GPU):**
+    *   **Embed & Store:** A "Case Bank" of 140+ expert adversarial prompts is vectorized and stored in a MongoDB Atlas vector database, creating a long-term memory.
+    *   **Retrieve & Re-rank:** For a new red teaming task, we perform a vector search to find 10 candidates from memory. These are then re-ranked using the powerful `Qwen/Qwen3-Reranker-4B` model to find the top 3 most relevant examples.
+    *   **Augment & Generate:** These top-tier examples are fed into a sophisticated "Actor" prompt for `openai/gpt-oss-20b`. This generates a new, unique adversarial prompt (the "secret witness").
+
+2.  **ZKP Engine (Local/macOS):**
+    *   **Prove:** The secret witness is fed into our "Janus" circuit, a custom Circom circuit with over 37,000 constraints.
+    *   **Generate:** Using a `Makefile`-automated workflow, our local engine generates a valid Groth16 proof, a public hash of the secret, and a Solidity verifier contract.
+
+3.  **Universal Verification (Cloud/Kaggle & On-Chain):**
+    *   The generated proof and public inputs are sent back to the cloud, where `snarkjs` verifies them, proving the audit occurred without revealing the secret.
+    *   The generated `Janus_Verifier.sol` contract can be deployed to any EVM-compatible blockchain for a permanent, on-chain record of the audit.
+
+## Getting Started: The ZKP Engine (`circom-scaffold`)
+
+This repository contains the core ZKP engine.
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/installation)
-- [Foundry](https://book.getfoundry.sh/getting-started/installation) for smart contract development.
-- **Rust & Cargo** for installing the Circom toolchain.
-- Run `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` to install Rust.
-- **Circom Compiler**: Run `cargo install circom`.
-- **snarkjs**: This is installed locally via `pnpm`. We will use `npx snarkjs`.
+-   [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/installation)
+-   [Foundry](https://book.getfoundry.sh/getting-started/installation) for smart contract development.
+-   **Rust & Cargo**: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+-   **Circom Compiler**: `cargo install circom`
+
 
 ### Installation
 
@@ -61,36 +80,18 @@ We are using `gpt-oss` to jailbreak itself and then using cryptography to *prove
 
 ### Usage
 
-This template has been modified to work with the latest version of the Circom compiler.
+The entire ZKP and smart contract workflow is automated. After cloning and running `pnpm install`, you just need to:
 
-**To generate a proof for the "Janus" circuit:**
+1.  **Set Your Secret:** Edit the `promptString` in `circom-scaffold/scripts-circom/main.js`.
+2.  **Run the Workflow:** From the `circom-scaffold` directory, run:
+    ```bash
+    make hackathon CIRCUIT_NAME=Janus
+    ```
+    This command will compile the circuit, generate keys, create a proof, generate a verifier, and run all on-chain tests with Foundry.
 
-```bash
-make hackathon CIRCUIT_NAME=Janus
-```
+## The Demo Notebook (`zk-redteamer.ipynb`)
 
-This single command will:
-1.  Compile the `circuits/Janus.circom` circuit.
-2.  Generate the proving and verification keys using the `pot16_final.ptau` file.
-3.  Execute `scripts-circom/main.js` to:
-    *   Take your secret prompt as a private input.
-    *   Generate a valid `proof.json` and `public.json` (containing the prompt's hash).
-4.  Run the verification script to confirm the proof is valid.
-
-The final proof and public signals can be found in the `outputs/verify/` directory.
-
-```bash
-make clean-all CIRCUIT_NAME=Janus
-```
-
-### Modifications for Modern Circom (v2.2.2+)
-
-The original `circom-startup` template was built for an older version of Circom. To get it working, we made the following critical changes:
-
-1.  **Removed `circomspect` and the `check` rule:** The `inspect` and `check` steps in the original `Makefile` were incompatible with the latest Circom compiler. We removed these steps and all their dependencies from the `Makefile` to streamline the build process.
-2.  **Used `npx snarkjs`:** To ensure the `Makefile` uses the locally installed version of `snarkjs` from `node_modules`, all calls to `snarkjs` were replaced with `npx snarkjs`.
-3.  **Updated Helper Scripts:** The files `scripts-circom/utils/generateProof.js` and `scripts-circom/utils/verify.js` were completely rewritten to correctly handle dynamic inputs and use the `groth16` proving system, fixing several hardcoded placeholders and logic bugs.
-4.  **Corrected Circuit Logic:** The `Janus.circom` file was written to handle large inputs (256 bytes) by implementing iterative hashing, as the standard `Poseidon` library has a small input limit.
+Our main demonstration is in the `zk-redteamer.ipynb` file, which is designed to be run on Kaggle or Google Colab. It performs the full RAG pipeline and then verifies a pre-computed proof generated by our local ZKP engine, simulating the full, end-to-end hybrid architecture.
 
 ---
 
