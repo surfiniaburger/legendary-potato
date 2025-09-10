@@ -79,6 +79,10 @@ This single command will:
 
 The final proof and public signals can be found in the `outputs/verify/` directory.
 
+```bash
+make clean-all CIRCUIT_NAME=Janus
+```
+
 ### Modifications for Modern Circom (v2.2.2+)
 
 The original `circom-startup` template was built for an older version of Circom. To get it working, we made the following critical changes:

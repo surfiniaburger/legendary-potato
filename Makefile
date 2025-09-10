@@ -22,16 +22,22 @@ skip: compile info setup-export-key generate-proof-verify generate-verifier soli
 # ===============================================================
 
 hackathon:
-	@echo "--- (1/5) Compiling Circuit ---"
+	@echo "--- (1/8) Compiling Circuit ---"
 	@make compile CIRCUIT_NAME=$(CIRCUIT_NAME)
-	@echo "\n--- (2/5) Generating ZKP Keys ---"
+	@echo "\n--- (2/8) Generating ZKP Keys ---"
 	@make setup-export-key CIRCUIT_NAME=$(CIRCUIT_NAME)
-	@echo "\n--- (3/5) Generating Solidity Verifier ---"
+	@echo "\n--- (3/8) Generating Solidity Verifier ---"
 	@make generate-verifier CIRCUIT_NAME=$(CIRCUIT_NAME)
-	@echo "\n--- (4/5) Generating Proof ---"
+	@echo "\n--- (4/8) Generating Proof ---"
 	@make generate-proof-verify CIRCUIT_NAME=$(CIRCUIT_NAME)
-	@echo "\n--- (5/5) Generating Solidity Calldata for Test ---"
+	@echo "\n--- (5/8) Generating Solidity Calldata for Test ---"
 	@make solidity-calldata CIRCUIT_NAME=$(CIRCUIT_NAME)
+	@echo "\n--- (6/8) Formatting Solidity Code ---"
+	@forge fmt
+	@echo "\n--- (7/8) Cleaning Foundry Cache ---"
+	@forge clean
+	@echo "\n--- (8/8) Running Smart Contract Tests ---"
+	@forge test
 
 # # Inspect the circuit
 # inspect:
