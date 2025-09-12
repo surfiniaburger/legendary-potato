@@ -88,6 +88,23 @@ The entire ZKP and smart contract workflow is automated. After cloning and runni
     make hackathon CIRCUIT_NAME=Janus
     ```
     This command will compile the circuit, generate keys, create a proof, generate a verifier, and run all on-chain tests with Foundry.
+3.  **Create the Asset Bundle:** Create the zip file containing the essential verification assets.
+    ```bash
+    zip zk_verifier_assets.zip outputs/keys/Janus_verification_key.json outputs/Janus_js/Janus.wasm
+    ```
+
+#### **Step 2: On Kaggle - Assemble the Final Demo Notebook**
+
+1.  **Upload Your Dataset:** Go to your Kaggle notebook. If you already have a `zk-redteam-verifier-assets` dataset, create a **new version** of it and upload your new `zk_verifier_assets.zip` file. If not, create it now.
+2.  **Update Your Notebook:** Use the final, definitive cells I provided.
+    *   **The RAG Pipeline Cell:** This is the one that just ran successfully. Keep it.
+    *   **The "Handoff" Markdown Cell:** Explain the architecture.
+    *   **The "Pre-Computed Proof" Cell:** After your `make hackathon` command finishes on your Mac, open `outputs/verify/Janus_proof.json` and `outputs/verify/Janus_public.json`. Copy their contents and paste them into this cell in your notebook.
+    *   **The "Verification" Cell:** Use the final version that reads from the Kaggle dataset.
+
+3.  **Run "Save Version":** In the top right of your Kaggle notebook, click "Save Version" and choose "Save & Run All (Commit)". This will run your entire notebook from top to bottom and create a clean, shareable, and verifiable result for the judges.
+
+
 
 ## The Demo Notebook (`zk-redteamer.ipynb`)
 
