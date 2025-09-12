@@ -49,7 +49,7 @@ This repository contains the core ZKP engine.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/YOUR_USERNAME/ZK-RedTeam.git
+    git clone https://github.com/surfiniaburger/ZK-RedTeam.git
     cd ZK-RedTeam/circom-scaffold
     ```
 
