@@ -16,6 +16,45 @@ As AI models become more powerful, how can we trust that they are safe? Companie
 
 Our journey led us to a key discovery: the base `gpt-oss` model is so well-aligned that it resists generating adversarial content. We had to develop a sophisticated, multi-step RAG pipeline to jailbreak the jailbreaker, demonstrating a critical vulnerability class. ZK-RedTeam is not just a tool; it's a demonstration of *why* verifiable auditing is so essential.
 
+Of course. Here is the final, definitive `README.md` for your project. It has been completely rewritten to tell the powerful, multi-chapter story of your journey and discoveries. This is the document that will introduce the judges to your incredible work.
+
+---
+
+# ZK-RedTeam: A Verifiable AI Safety Auditing Engine
+
+**🏆 A Submission to the OpenAI Open Model Hackathon | Categories: Wildcard & For Humanity 🏆**
+
+ZK-RedTeam is a multi-stage, open-source system for discovering and verifying vulnerabilities in Large Language Models. It culminates in an automated fuzzing engine, **ZK-JBFuzz**, that generates a Zero-Knowledge **"Proof of Exploit"** for novel jailbreaks.
+
+This project is not just a tool; it's a demonstration of a new paradigm for AI safety: a "trust-as-a-service" platform where security audits are not just claimed, but are mathematically proven and universally verifiable, all without compromising privacy.
+
+![ZK-RedTeam Flowchart](flow.jpeg)
+
+---
+
+## The Journey: A Three-Chapter Exploration
+
+Our project evolved through three distinct chapters, each uncovering a deeper layer of the AI safety problem.
+
+### Chapter 1: The RAG-Augmented Red Teamer
+
+Our initial goal was to build a sophisticated red teaming agent. We discovered that the base `gpt-oss-20b` model, with its `high` reasoning effort, is impressively robust and resists standard jailbreak attempts. To overcome this, we built a state-of-the-art RAG pipeline:
+*   **Long-Term Memory:** A "Case Bank" of 140+ expert adversarial prompts was vectorized using `unsloth/embedding-gemma-300m` and stored in MongoDB Atlas.
+*   **Intelligent Retrieval:** For a new task, we use vector search to retrieve 10 candidates, which are then re-ranked for relevance using the powerful `Qwen/Qwen3-Reranker-4B` model.
+*   **Contextual Generation:** The top 3 re-ranked examples are fed into a sophisticated "Actor" prompt for `gpt-oss-20b` (on `medium` reasoning), successfully generating a novel, context-aware adversarial prompt.
+
+### Chapter 2: The Automated Fuzzer - ZK-JBFuzz
+
+Inspired by the `JBFuzz` academic paper, we evolved our tool into an automated discovery engine to attack the model's strongest (`high` reasoning) setting.
+*   **Lightweight Evaluator:** We built a fast, k-NN classifier to instantly detect jailbreaks without needing another LLM.
+*   **Synonym-based Mutator:** A high-speed mutation engine creates thousands of prompt variations by intelligently swapping words with synonyms.
+*   **The Discovery:** We unleashed this fuzzer on the `gpt-oss-20b` model. **On its very first attempt, our engine discovered a novel jailbreak against the `high` reasoning setting**, proving the power and necessity of automated, evolutionary red teaming.
+
+### Chapter 3 (The Vision): Auditing the Purified Reasoner
+
+Inspired by frontier research discussions, our vision is to use ZK-JBFuzz as a scientific instrument to audit the next generation of "Purified Reasoner" AIs. The goal would be to hunt for **"Epistemic Breaches"**—forcing a supposedly "factless" model to state knowledge it could only have from its pre-training—and generate a cryptographic **Proof of Epistemic Breach**.
+
+
 ## How It Works: The "Cloud AI + Local Prover" Architecture
 
 Our system is a hybrid architecture that leverages the best of both cloud and local computing:
@@ -49,8 +88,8 @@ This repository contains the core ZKP engine.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/surfiniaburger/ZK-RedTeam.git
-    cd ZK-RedTeam/circom-scaffold
+    git clone https://github.com/surfiniaburger/legendary-potato.git
+    cd legendary-potato
     ```
 
 2.  **Install Node.js dependencies:**
