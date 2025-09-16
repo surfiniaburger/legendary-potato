@@ -17,8 +17,6 @@ As AI models become more powerful, how can we trust that they are safe? Companie
 
 Our journey led us to a key discovery: the base `gpt-oss` model is so well-aligned that it resists generating adversarial content. We had to develop a sophisticated, multi-step RAG pipeline to jailbreak the jailbreaker, demonstrating a critical vulnerability class. ZK-RedTeam is not just a tool; it's a demonstration of *why* verifiable auditing is so essential.
 
-Of course. Here is the final, definitive `README.md` for your project. It has been completely rewritten to tell the powerful, multi-chapter story of your journey and discoveries. This is the document that will introduce the judges to your incredible work.
-
 ---
 
 
