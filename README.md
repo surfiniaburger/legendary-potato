@@ -42,6 +42,8 @@ Inspired by the `JBFuzz` academic paper, we evolved our tool into an automated d
 
 ### Chapter 3: The Discovery - The Proof of Epistemic Breach
 
+![ZK-JBFuzz Ablation Study](ablation.png)
+
 Inspired by frontier research discussions, we fine-tuned `gpt-oss-20b` on a synthetic dataset of abstract logic to create a **"Purified Reasoner"**—a model designed to distrust its own internal knowledge.
 
 We then unleashed ZK-JBFuzz on this new, hardened target. The fuzzer's goal was to find an **"epistemic breach"**: a prompt that could force the model to state a real-world fact.
