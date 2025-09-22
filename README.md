@@ -150,7 +150,3 @@ To test run the zk-jbfuzz engine and the purified reasoner please take look at `
 This project is licensed under the MIT License.
 
 
-
-
-### Titan-Reasoner
-
