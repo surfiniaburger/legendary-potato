@@ -57,7 +57,7 @@ The model was trained for **one full epoch** over our 500-sample dataset (450 tr
 
 The validation loss being significantly lower than the training loss indicates that the model learned the underlying principle of context-adherence rather than merely memorizing the training data.
 
-
+![titan-loss-curve](titan-loss-curve.png)
 *Figure 1: The step_loss for the full-epoch training run, showing a stable and effective convergence.*
 
 ### Chapter 5: The Final Verdict - ZK-JBFuzz vs. The Titan-Reasoner
