@@ -94,7 +94,7 @@ To validate the general effectiveness of our methodology, we conducted an ablati
 
 ## How It Works: The "Cloud AI + Local Prover" Architecture
 
-Our system is a hybrid architecture that leverages the best of both cloud and local computing:
+Our system uses a hybrid architecture to ensure both computational power for AI discovery and cryptographic integrity for verification. The end-to-end workflow of ZK-RedTeam is visualized in Figure 1, which separates the process into two distinct operational zones: a private zone for discovery and a public zone for verification.
 
 1.  **AI Red Teamer (Cloud/Kaggle GPU):**
     *   **Embed & Store:** A "Case Bank" of 140+ expert adversarial prompts is vectorized and stored in a MongoDB Atlas vector database, creating a long-term memory.
@@ -109,6 +109,28 @@ Our system is a hybrid architecture that leverages the best of both cloud and lo
     *   The generated proof and public inputs are sent back to the cloud, where `snarkjs` verifies them, proving the audit occurred without revealing the secret.
     *   The generated `Janus_Verifier.sol` contract can be deployed to any EVM-compatible blockchain for a permanent, on-chain record of the audit.
 
+![ZK-RedTeam Flowchart](flow.jpeg)
+***Figure 1: The ZK-RedTeam hybrid architecture, demonstrating the separation between private proof generation and public, universal verification.***
+
+#### 1. The Private Zone (On the User's Machine)
+
+This is where the sensitive work of vulnerability discovery and proof generation occurs. All proprietary data, such as the exploit itself, remains securely in this environment.
+
+*   **Discovery:** The `ZK-RedTeam Tool` (our script containing the fuzzer or RAG agent) is executed. It interacts with a `User's Target AI Model` to discover a successful exploit, which we call the **`Secret Adversarial Prompt (Witness)`**.
+*   **Proof Generation:** This secret witness, along with the AI's corresponding response, are fed as **private inputs** into the `ZKP Proving Engine` (which uses Circom and SnarkJS). Using a secret **`Proving Key`**, the engine generates two things:
+    1.  A cryptographic **proof** that it executed this computation correctly.
+    2.  A set of **`Public Signals`**, which includes a hash of the secret prompt but not the prompt itself.
+*   **Data Isolation:** As the diagram emphatically shows, the secret witness and the proving key **NEVER CROSS** the boundary into the public zone. This is the core security guarantee of the system.
+
+#### 2. The Public Zone (Universal Verification)
+
+This zone contains only the public artifacts needed for anyone—a judge, a customer, or the public—to verify that an audit took place, without ever seeing the secret exploit.
+
+*   **Publication:** The user publishes three key artifacts: the generated **proof**, the **`Public Signals`** (containing the hash), and a public **`Verification Key`**.
+*   **Verification:** An external party can take these three artifacts and input them into a `ZKP Verification Engine`. The engine performs a mathematical check to confirm that the proof is valid for the given public signals and verification key.
+*   **The Verdict:** The result is a simple, binary output: **Verified** or **Invalid**. A "Verified" result provides mathematical certainty that the user possesses a secret prompt that hashes to the public value and produced the claimed AI response. This allows an organization to prove it has successfully red-teamed its own models without ever having to disclose the sensitive vulnerabilities found.
+
+---
 ## Getting Started: The ZKP Engine (`circom-scaffold`)
 
 This repository contains the core ZKP engine.
