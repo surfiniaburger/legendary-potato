@@ -6,8 +6,6 @@ ZK-RedTeam is an end-to-end system for the **automated discovery and cryptograph
 
 This project demonstrates a new paradigm for AI safety: a "trust-as-a-service" platform where security audits are not just claimed but are mathematically proven and universally verifiable. We prove that even models meticulously trained to be "factless" can be forced to default to their hidden knowledge, highlighting a critical and subtle failure mode.
 
-![ZK-RedTeam Flowchart](flow.jpeg)
-
 ---
 
 [model weights](https://huggingface.co/surfiniaburger/Purified-Reasoner-gpt-oss-20b-v1)
@@ -82,7 +80,7 @@ This is a subtle and critical failure mode. The model received a grammatically g
 
 To validate the general effectiveness of our methodology, we conducted an ablation study measuring model robustness against the fuzzer. The results show a clear trend: more data and higher reasoning capacity increase model robustness, but **no model is immune.**
 
-
+![Ablation study](ablation.png)
 *Figure 2: An ablation study showing the median number of fuzzer iterations required to achieve an epistemic breach across different model configurations.*
 
 ##### Methodological Notes
@@ -110,7 +108,7 @@ Our system uses a hybrid architecture to ensure both computational power for AI 
     *   The generated `Janus_Verifier.sol` contract can be deployed to any EVM-compatible blockchain for a permanent, on-chain record of the audit.
 
 ![ZK-RedTeam Flowchart](flow.jpeg)
-***Figure 1: The ZK-RedTeam hybrid architecture, demonstrating the separation between private proof generation and public, universal verification.***
+***Figure 3: The ZK-RedTeam hybrid architecture, demonstrating the separation between private proof generation and public, universal verification.***
 
 #### 1. The Private Zone (On the User's Machine)
 
