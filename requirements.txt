@@ -1,0 +1,35 @@
+# requirements.txt
+
+# For Unsloth and GPU-accelerated Transformers
+unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
+accelerate
+
+# For the Fuzzer Engine
+scikit-learn
+nltk
+pandas
+
+# For the RAG components and data handling
+sentence-transformers
+pymongo
+
+# For the Web App
+gradio
+
+# requirements.txt
+torch>=2.8.0
+transformers==4.55.4
+
+bitsandbytes
+titans-pytorch
+gradio[mcp]
+scikit-learn
+numpy
+pandas
+google-cloud-bigquery
+google-cloud-storage
+google-auth
+PyMuPDF
+db-dtypes
+google-cloud-bigquery-storage
+Pillow
