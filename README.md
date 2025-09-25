@@ -209,7 +209,66 @@ The entire ZKP and smart contract workflow is automated. After cloning and runni
 
 3.  **Run "Save Version":** In the top right of your Kaggle notebook, click "Save Version" and choose "Save & Run All (Commit)". This will run your entire notebook from top to bottom and create a clean, shareable, and verifiable result for the judges.
 
+---
 
+### RAG Pipeline
+
+Our Titan-Reasoner application is more than just a chatbot; it's a complete, multi-stage data pipeline designed to transform raw, unstructured research papers into clear, verifiable answers. Here’s how it works, step-by-step:
+
+#### **Phase 1: The Knowledge Foundation (A one-time process)**
+
+Everything starts with the raw data.
+
+**PDFs in a Bucket** ➔
+We begin by uploading a collection of complex, multi-page DIPG research papers as PDF files into a secure **Google Cloud Storage (GCS) bucket**.
+
+➔ **AI-Powered Parsing (`docling`)** ➔
+Our automated data ingestion script processes each PDF. It doesn't just scrape text; it uses `docling`, an advanced AI-powered library, to understand the document's structure.
+- **It extracts clean, readable text.**
+- **It perfectly formats complex tables into Markdown.**
+- **It finds every image, chart, and diagram,** saving them as new `.png` files.
+
+➔ **Multi-Modal Storage** ➔
+The parsed content is then intelligently distributed:
+- The **extracted images** are uploaded to a dedicated GCS bucket (`dipg-research-images`).
+- The **clean text and tables**, now containing placeholders that link to their corresponding images in the GCS bucket (e.g., `![...](gs://dipg-research-images/doc1_fig1.png)`), are split into smart, overlapping chunks.
+- These rich, multi-modal chunks are stored in a **Google BigQuery** table, creating a structured, queryable library of our knowledge.
+
+➔ **Vectorization for Search** ➔
+Finally, we create embeddings for each text chunk using the efficient `embeddinggemma-300m` model. These vectors, which capture the semantic meaning of the text, are stored in a specialized **MongoDB Atlas Vector Database**, indexed for lightning-fast similarity search.
+
+#### **Phase 2: The Live RAG Pipeline (What happens when you click "Submit")**
+
+Now, with our knowledge base built, the MCP server is ready for a user's query.
+
+**1. The User's Question** ➔
+A researcher asks a complex question in the Gradio interface:
+> *"What does the data say about the efficacy of ONC201?"*
+
+➔ **2. Initial Retrieval (MongoDB)** ➔
+The question is converted into a vector. MongoDB Atlas instantly searches through millions of vectors to find the **Top 10 text chunks** that are semantically closest to the user's query.
+
+➔ **3. Hydration (BigQuery)** ➔
+The system takes the IDs of these 10 chunks and retrieves their full, rich text (including Markdown tables and image links) from our BigQuery table.
+
+➔ **4. Advanced Re-ranking (Qwen3-Reranker)** ➔
+This is a critical step for accuracy. A simple vector search can be noisy. To find the absolute best context, we load the powerful **`Qwen3-Reranker-4B`** model. It doesn't just compare the query to each chunk; it reads the query and each of the 10 chunks *together* to judge true relevance. This sophisticated process allows it to select the **Top 3 most relevant documents** with extremely high precision. The reranker is then unloaded from memory to make space.
+
+➔ **5. Multi-Modal Synthesis (Open-Source Vision)** ➔
+The system now inspects the Top 3 text chunks for image links.
+- It finds the GCS paths for any charts or diagrams.
+- It loads a powerful, open-source vision model (`llava-v1.6-mistral-7b`).
+- The vision model "looks" at each image and generates a **detailed, expert-level summary** of what it sees (e.g., "This Kaplan-Meier curve shows a median survival of 22.5 months...").
+- These rich summaries are injected directly into the text chunks. The vision model is then unloaded.
+
+➔ **6. Final Generation (Titan-Reasoner)** ➔
+Finally, the rich, multi-modal context—containing clean text, structured tables, and AI-generated image summaries—is assembled into a meticulously crafted prompt. This prompt is fed to our specialized, fine-tuned **Titan-Reasoner (`gpt-oss-20b`)**. Because of its training, the Titan-Reasoner knows it must:
+- Base its answer **only** on this provided context.
+- **Never** use its internal knowledge.
+- **Cite its sources** for every claim.
+
+➔ **7. The Final Output**
+The MCP server returns a comprehensive, accurate, and fully verifiable answer to the user, complete with citations and links to the original reference images, delivering a trustworthy insight from a mountain of complex data in just a few seconds.
 
 ## The Demo Notebooks (`zk-redteamer.ipynb`)
 
