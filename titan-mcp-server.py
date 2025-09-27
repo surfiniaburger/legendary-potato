@@ -368,6 +368,10 @@ def query_dipg_reasoner(user_query: str) -> str:
 **USER'S QUESTION:**
 {user_query}
 
+**CRITICAL FINAL INSTRUCTION:**
+First, think step-by-step in an 'analysis' channel to determine the answer from the context.
+Then, you MUST conclude your response with a 'final' channel that contains ONLY the direct and concise answer to the user's question.
+
 **YOUR RESPONSE:**
 """
     messages = [{"role": "user", "content": system_prompt}]
