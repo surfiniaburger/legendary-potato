@@ -117,6 +117,62 @@ To validate the general effectiveness of our methodology, we conducted an ablati
 
 ---
 
+### **Chapter 7: Hardening Alignment with Reinforcement Learning (GRPO)**
+
+The quantitative evaluation in Chapter 6 provided a critical insight: our specialized model's core reasoning was sound, but its reliability was hindered by **behavioral inconsistencies**, particularly its adherence to our strict output format. Supervised Fine-Tuning (SFT) on our custom memory-augmented architecture had successfully imparted knowledge, but to enforce discipline, we needed to move from imitation to action.
+
+This chapter details our final hardening experiment: applying **Generative Reward Policy Optimization (GRPO)**, a form of Reinforcement Learning, to teach the model not just *what* to say, but *how* to behave.
+
+#### The Strategic Pivot: Adapting to the Hardware Wall
+
+As documented, training large models like `gpt-oss-20b` presents significant computational challenges. Our initial attempts to apply the memory-intensive GRPO process to this model were met with the 'hardware wall,' leading to `OutOfMemoryError` issues.
+
+To rigorously test the GRPO methodology, we made a strategic pivot to **`surfiniaburger/Purified-Reasoner-llama-3b-v3`**. This model serves as a methodologically sound substitute, as it underwent the exact same specialized, memory-augmented SFT process as its larger counterpart. This allows us to isolate and evaluate the specific impact of the GRPO training phase on a model with an identical behavioral profile.
+
+#### The Methodology: From Imitation to Consequence
+
+The `GRPOTrainer` shifts the learning paradigm from supervised imitation to reinforcement-based action. The process is straightforward:
+
+1.  **Generate:** For a given prompt, the model generates multiple potential completions.
+2.  **Score:** Each completion is judged in real-time by a suite of custom "reward functions" that codify our definition of a "good" response.
+3.  **Optimize:** The model's policy is updated, reinforcing the patterns that led to high-reward outputs.
+
+We translated our abstract safety goals into five concrete, code-based reward functions that acted as the automated critic for this process:
+
+*   **`match_format_exactly`**: Gave a high reward for perfectly structured `analysis` -> `final` outputs using the Harmony tags.
+*   **`match_format_approximately`**: Offered partial credit for including the right components, guiding the model toward the correct structure.
+*   **`reward_for_handling_conflict`**: Rewarded the model for correctly identifying and articulating conflicting information from different sources.
+*   **`reward_for_admitting_lack_of_knowledge`**: Provided a strong positive signal when the model correctly abstained from answering if the context was insufficient.
+*   **`penalize_for_hallucination`**: Applied a significant penalty for any epistemic breach where the model stated a real-world fact not present in the provided context.
+
+#### The Experiment in Progress: Awaiting the Verdict
+
+As of this writing, the GRPO training run is actively in progress, with all metrics being tracked in real-time on Weights & Biases.
+
+**Our central hypothesis is that by applying these targeted rewards, the GRPO-trained model will demonstrate a statistically significant improvement in behavioral alignment compared to its SFT-only predecessor.** We anticipate observing a model that is not necessarily more knowledgeable, but is quantifiably more disciplined, reliable, and safe in its operation.
+
+The final results will be analyzed upon completion of the training epoch.
+
+**W&B Run Link:** `[Placeholder: Insert Final Weights & Biases Run Link Here]`
+
+**Final Results:**
+
+*   **[Placeholder for Key Quantitative Result 1, e.g., "The average 'match_format_exactly' reward score increased from X to Y over the training run, indicating a Z% improvement in format adherence."]`**
+*   **[Placeholder for Key Quantitative Result 2, e.g., "The 'penalize_for_hallucination' reward remained consistently low, confirming that the GRPO process did not introduce new unsafe behaviors."]`**
+*   **[Placeholder for Qualitative Observation, e.g., "Manual inspection of the final model's outputs on the evaluation set shows a marked decrease in unformatted or incomplete responses compared to the pre-GRPO version."]`**
+
+![wandb-reward-chart](placeholder_wandb_chart.png)
+*`[Placeholder: Replace this with a screenshot of the wandb reward chart, showing the learning trend, particularly the 'reward/mean' metric over the training steps.]`*
+
+#### Expected Significance: The Power of Layered Training
+
+This experiment aims to validate a powerful, layered strategy for creating trustworthy AI. A successful outcome will demonstrate that the most effective path to building robust models for high-stakes domains is a two-stage process:
+
+1.  **Layer 1 (Specialized SFT):** Impart deep, domain-specific knowledge and a foundational understanding of the task.
+2.  **Layer 2 (GRPO / RL):** Harden the model's behavior, enforcing strict operational protocols and safety constraints.
+
+By separating the training of *knowledge* from the training of *discipline*, we can create models that are not only intelligent but also demonstrably more reliable and aligned with complex, real-world requirements.
+
 ## How It Works: The "Cloud AI + Local Prover" Architecture
 
 Our system uses a hybrid architecture to ensure both computational power for AI discovery and cryptographic integrity for verification. The end-to-end workflow of ZK-RedTeam is visualized in Figure 1, which separates the process into two distinct operational zones: a private zone for discovery and a public zone for verification.
