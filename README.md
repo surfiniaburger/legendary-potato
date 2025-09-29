@@ -173,6 +173,38 @@ This experiment aims to validate a powerful, layered strategy for creating trust
 
 By separating the training of *knowledge* from the training of *discipline*, we can create models that are not only intelligent but also demonstrably more reliable and aligned with complex, real-world requirements.
 
+### **(New) Chapter 8: The Multi-Agent RAG Architecture (`DIPGMasterAgent`)**
+
+#### **8.1 The Need for an Orchestrated Workflow**
+
+The successful fine-tuning of the **Titan-Reasoner** demonstrated our ability to create a model with specialized, context-adherent knowledge. However, a production-grade safety system requires more than just a powerful model; it requires a robust, fault-tolerant workflow. A single model, no matter how well-trained, can fail. A production system must anticipate and handle these failures gracefully.
+
+To meet this requirement, we encapsulated our RAG functionality within a sequential, multi-agent system: the **`DIPGMasterAgent`**. This architecture transforms our RAG pipeline from a simple data flow into an intelligent, self-correcting workflow, ensuring that the final output meets the highest standards of reliability.
+
+#### **8.2 System Architecture: The Five Core Agents**
+
+The `DIPGMasterAgent` is the central orchestrator, managing a team of specialized sub-agents and tools to process a user's query from ingestion to final response.
+
+*   **1. The `DIPGMasterAgent` (The Orchestrator):** This is the top-level controller for any query identified as being related to DIPG. As a sequential agent, it manages the entire workflow, calling upon other agents in a predefined order and making critical decisions based on their outputs.
+
+*   **2. The `dipg_knowledge_base_tool` (The Specialist):** The first agent called by the Master Agent. This tool queries our curated and vectorized knowledge base—the **MongoDB Atlas Vector Database** populated with parsed DIPG research. Its sole purpose is to retrieve the most relevant, high-fidelity information from our verified sources.
+
+*   **3. The Confidence Evaluation Agent (The Quality Gate):** This agent represents a critical safety check. It receives the raw output from the `dipg_knowledge_base_tool` and assesses its confidence. It is trained to flag responses that are incomplete, vague, return an error, or otherwise fail to directly address the user's query.
+
+*   **4. The Fallback Web Search Agent (The Safety Net):** If the Quality Gate reports low confidence, the `DIPGMasterAgent` triggers this agent. It uses the existing **Google Search agent** to perform a fallback web search, gathering broader context to supplement or clarify the initial, specialized retrieval. This ensures the system is resilient and can handle queries that fall outside the immediate scope of the knowledge base.
+
+*   **5. The Synthesizer Agent (The Finalizer):** This final agent is responsible for compiling the verified result. It receives either the high-confidence answer from the Specialist or the combined results from the Specialist and the Safety Net. It synthesizes this information into a single, coherent, and user-friendly response, ready for delivery.
+
+#### **8.3 Workflow and Integration with the `RootAgent`**
+
+This multi-agent system is seamlessly integrated into the existing framework, ensuring proper delegation and handling of all DIPG-related queries.
+
+1.  **Delegation:** A user's query is first received by the main `RootAgent`. The `RootAgent`'s instructions have been updated to identify any query related to DIPG and delegate it directly to the `DIPGMasterAgent`.
+2.  **Execution:** The `DIPGMasterAgent` executes its sequential workflow as described above: **Specialist -> Quality Gate -> (Conditional) Safety Net -> Finalizer**.
+3.  **Return:** The final, synthesized answer is returned to the `RootAgent`, which then delivers it to the user.
+
+This architecture provides a robust, multi-layered approach to information retrieval, ensuring that the answers provided by the Titan-Reasoner are not just accurate but also validated and complete, fulfilling the promise of a truly safety-conscious AI system.
+
 ## How It Works: The "Cloud AI + Local Prover" Architecture
 
 Our system uses a hybrid architecture to ensure both computational power for AI discovery and cryptographic integrity for verification. The end-to-end workflow of ZK-RedTeam is visualized in Figure 1, which separates the process into two distinct operational zones: a private zone for discovery and a public zone for verification.
