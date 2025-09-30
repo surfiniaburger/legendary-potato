@@ -8,6 +8,8 @@ This project demonstrates a new paradigm for AI safety: a "trust-as-a-service" p
 
 ---
 
+[family affair](aura-lp-ava.png)
+
 [model weights](https://huggingface.co/surfiniaburger/Purified-Reasoner-gpt-oss-20b-v1)
 
 ## The Problem: The Trust Deficit in AI Safety
