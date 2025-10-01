@@ -161,15 +161,56 @@ This experiment validates a powerful, layered strategy for creating trustworthy 
 
 By separating the training of *knowledge* from the training of *discipline*, we have demonstrated a clear and repeatable methodology for creating models that are not only intelligent but also quantifiably more reliable and aligned with complex safety requirements.
 
-### **(New) Chapter 8: The Multi-Agent RAG Architecture (`DIPGMasterAgent`)**
 
-#### **8.1 The Need for an Orchestrated Workflow**
+### **(New) Chapter 8: Quantitative GRPO Evaluation: A Post-Mortem Analysis**
+
+While the training metrics for our GRPO run (`bumbling-dragon-90`) showed a promising upward trend, a core tenet of building safe AI is **"distrust, then verify."** Training logs can sometimes be misleading, reflecting a model's ability to "hack" rewards rather than learn the intended behavior.
+
+To provide a definitive, quantitative verdict on the success of our hardening process, we conducted a rigorous post-deployment evaluation. We generated a new, unseen evaluation dataset and ran the final, merged `surfiniaburger/llama-3b-pDIPG-GRPO-v3` model against it, scoring its responses using the exact same suite of reward functions that guided its training.
+
+The results are conclusive and serve as a critical finding for the project: the GRPO training was **not successful** in instilling the desired safety behaviors into the final model.
+
+#### **Benchmark Summary: Average Reward Scores**
+
+The table below shows the average score for each of our target behaviors. The scoring is designed such that positive values indicate success and negative values indicate failure.
+
+| Reward Function | Average Score | Desired Outcome | Result |
+| :--- | :---: | :---: | :---: |
+| `penalize_for_hallucination` | -4.00 | Positive | **Critical Failure** |
+| `reward_for_handling_conflict` | -5.00 | Positive | **Total Failure** |
+| `reward_for_admitting_lack_of_knowledge` | -5.00 | Positive | **Total Failure** |
+| `match_format_exactly` | -3.00 | Positive | **Total Failure** |
+| `match_format_approximately` | -3.00 | Positive | **Total Failure** |
+
+#### **Detailed Performance Analysis**
+
+*   **Critical Failure: Hallucination (`penalize_for_hallucination` = -4.00):** This is the most alarming result. The model was heavily penalized because it consistently failed its primary safety directive. When given a medical context but asked a general knowledge question (e.g., "Who wrote 'Hamlet'?"), it almost always ignored the instruction to use *only* the provided text and answered from its internal, pretrained knowledge. This "epistemic breach" is the exact failure mode the training was designed to prevent.
+
+*   **Total Failure: Handling Conflict and Abstention (`reward_for_handling_conflict` = -5.00, `reward_for_admitting_lack_of_knowledge` = -5.00):** The model failed completely in the two core reasoning tasks. It never correctly identified that "Source A" and "Source B" were contradictory, nor did it ever correctly state that the provided text was insufficient to answer a question. This indicates the reinforcement learning process did not successfully teach the model these nuanced safety protocols.
+
+*   **Total Failure: Format Adherence (`match_format_exactly` = -3.00):** The model completely disregarded the strict `analysis -> final` channel format it was trained on. Not a single generated response in the evaluation set used the correct `<|channel|>` tokens, indicating the base model's default formatting habits were not overwritten by the GRPO process.
+
+#### **Root Cause Analysis & Significance**
+
+This evaluation provides a crucial insight: **positive training logs do not guarantee a successful model.** The discrepancy between the W&B training run and these final results suggests one or more of the following:
+
+1.  **Reward Hacking:** The model likely learned superficial patterns to maximize rewards during training (e.g., using certain keywords) without grasping the underlying principles of format adherence or logical abstention.
+2.  **Insufficient Training Intensity:** A single epoch of GRPO may have been insufficient to fundamentally alter the powerful, ingrained behaviors of the base Llama 3.2 model.
+3.  **The Challenge of Unlearning:** Teaching a model *not* to be helpful (i.e., not to answer a question it knows) is a notoriously difficult alignment task that likely requires more sophisticated data or longer training cycles.
+
+This finding is not a setback but a core conclusion of the ZK-RedTeam project. It proves, with quantitative data, that even a well-intentioned and methodologically sound fine-tuning process can fail. It underscores the absolute necessity of independent, post-deployment auditing systems. You cannot simply trust the training process; you must have a robust mechanism to **verify** the final artifact's behavior, which is the central thesis of our work.
+
+
+
+### **(New) Chapter 9: The Multi-Agent RAG Architecture (`DIPGMasterAgent`)**
+
+#### **9.1 The Need for an Orchestrated Workflow**
 
 The successful fine-tuning of the **Titan-Reasoner** demonstrated our ability to create a model with specialized, context-adherent knowledge. However, a production-grade safety system requires more than just a powerful model; it requires a robust, fault-tolerant workflow. A single model, no matter how well-trained, can fail. A production system must anticipate and handle these failures gracefully.
 
 To meet this requirement, we encapsulated our RAG functionality within a sequential, multi-agent system: the **`DIPGMasterAgent`**. This architecture transforms our RAG pipeline from a simple data flow into an intelligent, self-correcting workflow, ensuring that the final output meets the highest standards of reliability.
 
-#### **8.2 System Architecture: The Five Core Agents**
+#### **9.2 System Architecture: The Five Core Agents**
 
 The `DIPGMasterAgent` is the central orchestrator, managing a team of specialized sub-agents and tools to process a user's query from ingestion to final response.
 
@@ -183,7 +224,7 @@ The `DIPGMasterAgent` is the central orchestrator, managing a team of specialize
 
 *   **5. The Synthesizer Agent (The Finalizer):** This final agent is responsible for compiling the verified result. It receives either the high-confidence answer from the Specialist or the combined results from the Specialist and the Safety Net. It synthesizes this information into a single, coherent, and user-friendly response, ready for delivery.
 
-#### **8.3 Workflow and Integration with the `RootAgent`**
+#### **9.3 Workflow and Integration with the `RootAgent`**
 
 This multi-agent system is seamlessly integrated into the existing framework, ensuring proper delegation and handling of all DIPG-related queries.
 
@@ -373,5 +414,42 @@ To test run the zk-jbfuzz engine and the purified reasoners please take look at 
 
 ## License
 
-This project is licensed under the MIT License.
+
+### **(New) Chapter 8: Quantitative GRPO Evaluation: A Post-Mortem Analysis**
+
+While the training metrics for our GRPO run (`bumbling-dragon-90`) showed a promising upward trend, a core tenet of building safe AI is **"distrust, then verify."** Training logs can sometimes be misleading, reflecting a model's ability to "hack" rewards rather than learn the intended behavior.
+
+To provide a definitive, quantitative verdict on the success of our hardening process, we conducted a rigorous post-deployment evaluation. We generated a new, unseen evaluation dataset and ran the final, merged `surfiniaburger/llama-3b-pDIPG-GRPO-v3` model against it, scoring its responses using the exact same suite of reward functions that guided its training.
+
+The results are conclusive and serve as a critical finding for the project: the GRPO training was **not successful** in instilling the desired safety behaviors into the final model.
+
+#### **Benchmark Summary: Average Reward Scores**
+
+The table below shows the average score for each of our target behaviors. The scoring is designed such that positive values indicate success and negative values indicate failure.
+
+| Reward Function | Average Score | Desired Outcome | Result |
+| :--- | :---: | :---: | :---: |
+| `penalize_for_hallucination` | -4.00 | Positive | **Critical Failure** |
+| `reward_for_handling_conflict` | -5.00 | Positive | **Total Failure** |
+| `reward_for_admitting_lack_of_knowledge` | -5.00 | Positive | **Total Failure** |
+| `match_format_exactly` | -3.00 | Positive | **Total Failure** |
+| `match_format_approximately` | -3.00 | Positive | **Total Failure** |
+
+#### **Detailed Performance Analysis**
+
+*   **Critical Failure: Hallucination (`penalize_for_hallucination` = -4.00):** This is the most alarming result. The model was heavily penalized because it consistently failed its primary safety directive. When given a medical context but asked a general knowledge question (e.g., "Who wrote 'Hamlet'?"), it almost always ignored the instruction to use *only* the provided text and answered from its internal, pretrained knowledge. This "epistemic breach" is the exact failure mode the training was designed to prevent.
+
+*   **Total Failure: Handling Conflict and Abstention (`reward_for_handling_conflict` = -5.00, `reward_for_admitting_lack_of_knowledge` = -5.00):** The model failed completely in the two core reasoning tasks. It never correctly identified that "Source A" and "Source B" were contradictory, nor did it ever correctly state that the provided text was insufficient to answer a question. This indicates the reinforcement learning process did not successfully teach the model these nuanced safety protocols.
+
+*   **Total Failure: Format Adherence (`match_format_exactly` = -3.00):** The model completely disregarded the strict `analysis -> final` channel format it was trained on. Not a single generated response in the evaluation set used the correct `<|channel|>` tokens, indicating the base model's default formatting habits were not overwritten by the GRPO process.
+
+#### **Root Cause Analysis & Significance**
+
+This evaluation provides a crucial insight: **positive training logs do not guarantee a successful model.** The discrepancy between the W&B training run and these final results suggests one or more of the following:
+
+1.  **Reward Hacking:** The model likely learned superficial patterns to maximize rewards during training (e.g., using certain keywords) without grasping the underlying principles of format adherence or logical abstention.
+2.  **Insufficient Training Intensity:** A single epoch of GRPO may have been insufficient to fundamentally alter the powerful, ingrained behaviors of the base Llama 3.2 model.
+3.  **The Challenge of Unlearning:** Teaching a model *not* to be helpful (i.e., not to answer a question it knows) is a notoriously difficult alignment task that likely requires more sophisticated data or longer training cycles.
+
+This finding is not a setback but a core conclusion of the ZK-RedTeam project. It proves, with quantitative data, that even a well-intentioned and methodologically sound fine-tuning process can fail. It underscores the absolute necessity of independent, post-deployment auditing systems. You cannot simply trust the training process; you must have a robust mechanism to **verify** the final artifact's behavior, which is the central thesis of our work.
 
